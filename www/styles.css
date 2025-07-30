@@ -103,3 +103,10 @@
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
 }
+
+/* Style for disabled tab links */
+.disabled-tab-link {
+    pointer-events: none; /* Disables click events */
+    opacity: 0.6;        /* Makes it look disabled */
+    cursor: not-allowed; /* Shows a no-entry cursor */
+}

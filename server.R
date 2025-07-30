@@ -230,7 +230,7 @@ server <- function(input, output, session) {
             if (!is.na(sd_age)) {
               lower_age <- round(gmm_model_result$parameters$mean["Age", i] - 2 * sd_age, 1)
               upper_age <- round(gmm_model_result$parameters$mean["Age", i] + 2 * sd_age, 1)
-              cat(paste0("  Estimated Age Range (Mean +/- 2SD): [", max(0, lower_age), " to ", max(0, upper_age), "] years\n"))
+              cat(paste0("  Estimated Age Range (Mean +/- 2SD): [", max(0, lower_age), " to ", max(0, upper_age), "] years\n")) # Cap lower bound at 0
             } else {
               cat("  Estimated Age Range: N/A (Std Dev Age problematic)\n")
             }
