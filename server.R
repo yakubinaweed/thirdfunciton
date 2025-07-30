@@ -29,7 +29,7 @@ server <- function(input, output, session) {
   source("serversecond/refiner.R", local = TRUE)
   source("serversecond/standard_z.R", local = TRUE)
 
-  # Define age ranges for consistent labeling
+  # Define age ranges for consistent labeling (for 'Cluster Counts by Age Group' table)
   age_ranges_for_labeling <- list(
     "0-10 years" = c(0, 10),
     "10-30 years" = c(10, 30),
@@ -171,8 +171,6 @@ server <- function(input, output, session) {
         output$gmm_summary <- renderPrint({
           print(summary(gmm_model_result))
 
-          # --- REMOVED: Full Structure of gmm_model_result$parameters$variance debug print ---
-
           cat("\n--- Detailed Subpopulation Characteristics ---\n")
           num_clusters <- gmm_model_result$G
           
@@ -197,15 +195,9 @@ server <- function(input, output, session) {
             cat(paste0("  Mean HGB: ", round(gmm_model_result$parameters$mean["HGB", i], 3), "\n"))
             cat(paste0("  Mean Age: ", round(gmm_model_result$parameters$mean["Age", i], 3), "\n"))
             
-            # --- FINAL FIX: Accessing variances from the 'sigma' 3D array for multivariate models ---
+            # --- FIX: Accessing variances from the 'sigma' 3D array for multivariate models ---
             # gmm_model_result$parameters$variance$sigma is a 3D array: [row_var, col_var, cluster_index]
             cluster_covariance_matrix <- gmm_model_result$parameters$variance$sigma[,,i]
-            
-            # Removed previous detailed DEBUG prints for cleaner output
-            # print(paste0("DEBUG: Cluster ", i, " Full Covariance Matrix (sigma[,,", i, "]):"))
-            # print(cluster_covariance_matrix)
-            # print(paste0("DEBUG: Dims of cluster_covariance_matrix: ", paste(dim(cluster_covariance_matrix), collapse = "x")))
-            # print(paste0("DEBUG: Colnames of cluster_covariance_matrix: ", paste(colnames(cluster_covariance_matrix), collapse = ", ")))
             
             hgb_variance_val <- NA
             age_variance_val <- NA
@@ -231,14 +223,14 @@ server <- function(input, output, session) {
               warning(paste0("Age variance for Cluster ", i, " is problematic or negative: ", age_variance_val))
             }
 
-            cat(paste0("  Std Dev HGB: ", ifelse(is.na(sd_hgb), "N/A", round(sd_hgb, 3)), "\n"))
-            cat(paste0("  Std Dev Age: ", ifelse(is.na(sd_age), "N/A", round(sd_age, 3)), "\n"))
+            cat(paste0("  Std Dev HGB: ", ifelse(is.na(sd_hgb), "N/A", round(sd_hgb, 3)), "\n")) # Print N/A if sd_hgb is NA
+            cat(paste0("  Std Dev Age: ", ifelse(is.na(sd_age), "N/A", round(sd_age, 3)), "\n")) # Print N/A if sd_age is NA
             
             # --- Estimated Age Range for the cluster ---
             if (!is.na(sd_age)) {
               lower_age <- round(gmm_model_result$parameters$mean["Age", i] - 2 * sd_age, 1)
               upper_age <- round(gmm_model_result$parameters$mean["Age", i] + 2 * sd_age, 1)
-              cat(paste0("  Estimated Age Range (Mean +/- 2SD): [", max(0, lower_age), " to ", max(0, upper_age), "] years\n"))
+              cat(paste0("  Estimated Age Range (Mean +/- 2SD): [", max(0, lower_age), " to ", max(0, upper_age), "] years\n")) # Cap lower bound at 0
             } else {
               cat("  Estimated Age Range: N/A (Std Dev Age problematic)\n")
             }
@@ -252,7 +244,7 @@ server <- function(input, output, session) {
       }, error = function(e) {
         message_rv(list(text = paste("Error during subpopulation detection:", e$message), type = "danger"))
         print(paste("DEBUG ERROR: Error during GMM analysis:", e$message))
-        output$gmm_results_ui <- renderUI({ tagList() })
+        output$gmm_results_ui <- renderUI({ tagList() }) # Clear previous dynamic UI results on error
       }, finally = {
         analysis_running(FALSE)
         print("DEBUG: GMM analysis finally block executed.")
