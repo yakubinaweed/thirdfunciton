@@ -97,22 +97,22 @@ ui <- navbarPage(
   ),
 
   tabPanel(
-    title = "Subpopulation Detection (GMM)", # Updated title
+    title = "Subpopulation Detection (GMM)",
     useShinyjs(),
-    h4("Detect Subpopulations using HGB and Age"), # Updated heading
-    p("Gaussian Mixture Models aim to detect hidden subpopulations within your data based on HGB and Age. The system will automatically select the best number of components (between 2 and 5) using the Bayesian Information Criterion (BIC), where the lowest BIC value indicates the optimal fit. For each detected subpopulation, estimated age ranges will be provided directly from the model's characteristics, avoiding predefined bins. While increasing the number of components can improve model fit, it also increases the risk of overfitting, where the model learns noise rather than true underlying patterns."), # Added explanation
+    h4("Detect Subpopulations using HGB and Age"),
+    p("Gaussian Mixture Models aim to detect hidden subpopulations within your data based on HGB and Age. The system will automatically select the best number of components (between 2 and 5) using the Bayesian Information Criterion (BIC), where the lowest BIC value indicates the optimal fit. For each detected subpopulation, estimated age ranges will be provided directly from the model's characteristics, avoiding predefined bins. While increasing the number of components can improve model fit, it also increases the risk of overfitting, where the model learns noise rather than true underlying patterns."),
     fluidRow(
       column(4,
              fileInput(inputId = "gmm_data_file", label = "Upload Data (Excel File)", accept = c(".xlsx")),
-             selectInput(inputId = "gmm_col_value", label = "Select Column for HGB Values:", # Clarified label
+             selectInput(inputId = "gmm_col_value", label = "Select Column for HGB Values:",
                          choices = c("None" = ""), selected = ""),
-             selectInput(inputId = "gmm_col_age", label = "Select Column for Age:", # Clarified label
+             selectInput(inputId = "gmm_col_age", label = "Select Column for Age:",
                          choices = c("None" = ""), selected = ""),
-             actionButton("run_gmm_analysis", "Run Subpopulation Detection", class = "btn-primary"), # Updated button label
+             actionButton("run_gmm_analysis", "Run Subpopulation Detection", class = "btn-primary"),
              actionButton("reset_gmm_btn", "Reset GMM Data", class = "btn-secondary")
       ),
       column(8,
-             uiOutput("gmm_results_ui") # This will render dynamic plots/summaries
+             uiOutput("gmm_results_ui")
       )
     )
   ),
